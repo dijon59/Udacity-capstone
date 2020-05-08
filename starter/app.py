@@ -15,7 +15,7 @@ def create_app(test_config=None):
 
     @app.route('/')
     def index():
-        return "API tests of Casting Agency project"
+        return "API tests for Casting Agency project"
 
     @app.after_request
     def after_request(response):

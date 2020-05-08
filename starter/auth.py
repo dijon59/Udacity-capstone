@@ -5,14 +5,13 @@ from flask import request, _request_ctx_stack
 from functools import wraps
 from jose import jwt
 
-# AUTH0_DOMAIN = os.environ['AUTH0_DOMAIN']
-# ALGORITHMS = os.environ['ALGORITHMS']
-# API_AUDIENCE = os.environ['API_AUDIENCE']
+AUTH0_DOMAIN = os.environ.get('AUTH0_DOMAIN', 'udacity-capstone-project.auth0.com')
+ALGORITHMS = os.environ.get('ALGORITHMS', 'RS256')
+API_AUDIENCE = os.environ.get('API_AUDIENCE', 'capstone-app')
 
-
-AUTH0_DOMAIN = 'udacity-capstone-project.auth0.com'
-ALGORITHMS = ['RS256']
-API_AUDIENCE = 'capstone-app'
+# AUTH0_DOMAIN = 'udacity-capstone-project.auth0.com'
+# ALGORITHMS = ['RS256']
+# API_AUDIENCE = 'capstone-app'
 
 # print(AUTH0_DOMAIN, ALGORITHMS, API_AUDIENCE)
 

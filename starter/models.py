@@ -5,21 +5,21 @@ import sqlalchemy as sa
 # from sqlalchemy.orm import relationship
 import os
 
-database_name = 'capstone_db'
-database_path = "postgres://{}/{}".format('localhost:5432', database_name)
-# DATABASE_URI = os.getenv('DATABASE_URI')
+# database_name = 'capstone_db'
+# database_path = "postgres://{}/{}".format('localhost:5432', database_name)
+DATABASE_URL = os.environ.get('DATABASE_URL', 'postgres://localhost:5432/capstone_db')
 
 db = SQLAlchemy()
 
 
 # print(DATABASE_URI)
-def setup_db(app, path_db=database_path):
+def setup_db(app, path_db=DATABASE_URL):
     # app.config.from_object('config')
     app.config['SQLALCHEMY_DATABASE_URI'] = path_db
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
     db.init_app(app)
-    # db.create_all()
+    db.create_all()
 
 
 # def db_drop_and_create_all():
