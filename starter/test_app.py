@@ -6,15 +6,10 @@ from flask_sqlalchemy import SQLAlchemy
 from app import create_app
 from models import setup_db, Actor, Movie
 
-# TEST_DATABASE_URI = os.getenv('TEST_DATABASE_URI')
-# CASTING_ASSISTANT = os.getenv('CASTING_ASSISTANT')
-# CASTING_DIRECTOR = os.getenv('CASTING_DIRECTOR')
-# EXECUTIVE_PRODUCER = os.getenv('EXECUTIVE_PRODUCER')
 
-
-CASTING_ASSISTANT = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InlXRTdkaU5pRnVUS1oxWDNzQ1pRWiJ9.eyJpc3MiOiJodHRwczovL3VkYWNpdHktY2Fwc3RvbmUtcHJvamVjdC5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWViNDFkYzkxY2MxYWMwYzE0OGZlNTczIiwiYXVkIjoiY2Fwc3RvbmUtYXBwIiwiaWF0IjoxNTg4OTI3MDMzLCJleHAiOjE1ODg5MzQyMzMsImF6cCI6ImdYS3hhNGwzTGMyczM1WTNldFlMM1JZMXBKUGdKcWZYIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJnZXQ6YWN0b3JzIiwiZ2V0Om1vdmllcyJdfQ.CBDrG5L0kF5eD-wQDi2hdpwg079ioN5dTeKmdK16iKtwMCIzdI3JibMkvYR8rBxIkjfxb1_qLOOIvxfoP5F3QTV5S6HoXvagiqhB-9LMG-o_mr7wgQKG8hUBGpcNcAof-HSY3YwnAuUXclqi_UWPSq6sYt35eIoxs-EBVVs5oHeWw0h3Acca-eIZHfr6UbN88KkTWFaM2ltxkWfhy0vYSy8jNIosbPQ6MnHL8oZkPyOU1ZJkge17YC4Jn2rzWlI_iPSvnI37fnxgrK4XU1RMUOaiuUsLzmXxy_stJLerGenao88uNOhKN-J89qgRtgNzZkYEgYsMkHf-AnO137eCSg'
-CASTING_DIRECTOR = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InlXRTdkaU5pRnVUS1oxWDNzQ1pRWiJ9.eyJpc3MiOiJodHRwczovL3VkYWNpdHktY2Fwc3RvbmUtcHJvamVjdC5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWViNDFmNDAxY2MxYWMwYzE0OGZlYWQwIiwiYXVkIjoiY2Fwc3RvbmUtYXBwIiwiaWF0IjoxNTg4OTI3MTUwLCJleHAiOjE1ODg5MzQzNTAsImF6cCI6ImdYS3hhNGwzTGMyczM1WTNldFlMM1JZMXBKUGdKcWZYIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJkZWxldGU6YWN0b3JzIiwiZ2V0OmFjdG9ycyIsImdldDptb3ZpZXMiLCJwYXRjaDphY3RvcnMiLCJwYXRjaDptb3ZpZXMiLCJwb3N0OmFjdG9ycyJdfQ.TTJg_OL_Z4isQarRcMBZ1RlRZRI4c8Ld05LLOkzQIOIx7ZYj4rTgY7tcKHPPk4aJuRMoTuHjQOgVids2kcx2kEsiOqLQQxFcoqoyCNl9azC7JXd1ai_iQmb3ES-D0imY5gd_YNgaMxEaaDpCh6oSSlSLx6rvsOkcPX1eb27rjAPiM7yuEZsa_vXZz2lCWjfCaSLNOzaB2coEpsYUEwwxzO5eMZLUOhDE4PeIhvyHyMeRoiCm6qZmhbaAf-sRQLgZN8SZHVkT6YDE8HtxuzUfg_oAIxXpnb89g_lfrbHHHbt8_cid09etbgw8hkvw4jCipNn8dRUDsXiK1cweyQpL8Q'
-EXECUTIVE_PRODUCER = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InlXRTdkaU5pRnVUS1oxWDNzQ1pRWiJ9.eyJpc3MiOiJodHRwczovL3VkYWNpdHktY2Fwc3RvbmUtcHJvamVjdC5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWViNDFmODk2YjY5YmMwYzEyZmY2YmVlIiwiYXVkIjoiY2Fwc3RvbmUtYXBwIiwiaWF0IjoxNTg4OTI3MjIxLCJleHAiOjE1ODg5MzQ0MjEsImF6cCI6ImdYS3hhNGwzTGMyczM1WTNldFlMM1JZMXBKUGdKcWZYIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJkZWxldGU6YWN0b3JzIiwiZGVsZXRlOm1vdmllcyIsImdldDphY3RvcnMiLCJnZXQ6bW92aWVzIiwicGF0Y2g6YWN0b3JzIiwicGF0Y2g6bW92aWVzIiwicG9zdDphY3RvcnMiLCJwb3N0Om1vdmllcyJdfQ.GJ6Nmyw53NPAmjl1SSilqOg2Y9CpjF59PV64FHIo9dfjSXNN1jvfb9g9DY-RNrt5w9_OZQ4KfzgN0wTtI7_d-hYw168-yI79n8PeTQz-TlwT3vsf8CGhUQzbpxa3TOlAuEWqAfK8T28FNHzRXfOqJ8My-1fcEN-DUUVwCvbuBcL_J-vfr70d9QLnI_hiAkgsCG_XW_ttVvPh__v0kgR47tSzBL5-K4qF94EBkojaBk_H-ahf3k0sfWY_FY8Sp2eZNcpdQ3uBhzf4Y9Vh6y-409iJ7CQPyp5b347CO0bOFMRNfA_jrcAvRsuu8YXwpaA_d_v5BaxDmC1xYUk6OxuMxQ'
+CASTING_ASSISTANT = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InlXRTdkaU5pRnVUS1oxWDNzQ1pRWiJ9.eyJpc3MiOiJodHRwczovL3VkYWNpdHktY2Fwc3RvbmUtcHJvamVjdC5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWViNDFkYzkxY2MxYWMwYzE0OGZlNTczIiwiYXVkIjoiY2Fwc3RvbmUtYXBwIiwiaWF0IjoxNTg4OTM4NDQzLCJleHAiOjE1ODg5NDU2NDMsImF6cCI6ImdYS3hhNGwzTGMyczM1WTNldFlMM1JZMXBKUGdKcWZYIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJnZXQ6YWN0b3JzIiwiZ2V0Om1vdmllcyJdfQ.GOSm417wdPaCHiCoFsJH7fnicvwaAjJxEkfIVe8evXk-WTrUVKiI0vdT5X5zfSgZ8YV_fytnkeF3t4uqYV3TwVQebcPW1FEchbJLTheOPuBH4oRGPbmtx9L2fjZsL99kBH7auGLLWd0DayUaseXt0f16pv-KlSe3f4HQmIW79KKhtPO_6WioQS3z-PS0ryhJ7sIv2w-dAB3G3nwXC1azK55s5LXaxS9s5Q4Ap-g3mIuQGnGyieWWpRHvAt9zrS-JtZFqtbpl7uGh9VT5BeARYs_-VoBxTaGSnT12brtkv4R87cWJP5ZH3p9z-WJkJpOgu3rB-8CZ1UFRDHUp7B2pWQ'
+CASTING_DIRECTOR = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InlXRTdkaU5pRnVUS1oxWDNzQ1pRWiJ9.eyJpc3MiOiJodHRwczovL3VkYWNpdHktY2Fwc3RvbmUtcHJvamVjdC5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWViNDFmNDAxY2MxYWMwYzE0OGZlYWQwIiwiYXVkIjoiY2Fwc3RvbmUtYXBwIiwiaWF0IjoxNTg4OTM4NTMyLCJleHAiOjE1ODg5NDU3MzIsImF6cCI6ImdYS3hhNGwzTGMyczM1WTNldFlMM1JZMXBKUGdKcWZYIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJkZWxldGU6YWN0b3JzIiwiZ2V0OmFjdG9ycyIsImdldDptb3ZpZXMiLCJwYXRjaDphY3RvcnMiLCJwYXRjaDptb3ZpZXMiLCJwb3N0OmFjdG9ycyJdfQ.Ego26tyfdDsqtgW2yGQffB6CsU2qvMrp6gq5kuMCnPRgAM542P08s4NaXgFnHjYb8EjNmpFZ7sIWTAbkTfFEAEx_i7lmvLVgfQeYKsQTxuW74mWDMU399K-jnlUNy9qfYxvgXKwgyX1rXqDfl7R8OaFEgoYn1TgjcElKyfYU1HczvqzypI7tQhonuCyoNgjLhO1Pib5b3IGcO6c7dN0VTfTas20jFdUt5uU_CRC2eXW_QJM1TTJLW87e0bkEZn_mJmrvyIJv0cDEV79KisVqGih18-RZhpq7HvxDiRSyeJZ80c6s4eX6UmiMFGpA2Qyi9nbtiXsG4V9Ea0lYuDxEsw'
+EXECUTIVE_PRODUCER = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InlXRTdkaU5pRnVUS1oxWDNzQ1pRWiJ9.eyJpc3MiOiJodHRwczovL3VkYWNpdHktY2Fwc3RvbmUtcHJvamVjdC5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWViNDFmODk2YjY5YmMwYzEyZmY2YmVlIiwiYXVkIjoiY2Fwc3RvbmUtYXBwIiwiaWF0IjoxNTg4OTM4NjA5LCJleHAiOjE1ODg5NDU4MDksImF6cCI6ImdYS3hhNGwzTGMyczM1WTNldFlMM1JZMXBKUGdKcWZYIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJkZWxldGU6YWN0b3JzIiwiZGVsZXRlOm1vdmllcyIsImdldDphY3RvcnMiLCJnZXQ6bW92aWVzIiwicGF0Y2g6YWN0b3JzIiwicGF0Y2g6bW92aWVzIiwicG9zdDphY3RvcnMiLCJwb3N0Om1vdmllcyJdfQ.dZBXa-6HfVbhayfPQ9Bsiu1si67Ws2RZpCRnO1Eb1sWCS523Fe8R8XzbzwcGnJCVpMGmDtzq7yQCFWuVSE6N6vfaCl5-Sor2wDU8Z0ZO_Q_rCuTqxldCGrrTnqQRo5NoNM6GWl_CcOAmGCeIXUkBHYCSdgsb_gaHCmCrQLTiB7oFiRrK7bZorttOGyRhaEZcZc5ZkscVbAtpyv84gPv-rIX7U3qOefWRgew-HZupGvszvW2eXHWW8Wly62tFROfuaBigwEfDhI4MAy_bSZXwo1UUO0Gn1rf4xAsSDvxoWjvpuPYqxJe5NnLsKXCebpSTDaQqvAQDiCL5x_B6vl9z2Q'
 
 
 class CastingAgencyTestCase(unittest.TestCase):
@@ -69,15 +64,11 @@ class CastingAgencyTestCase(unittest.TestCase):
     '''
 
     def test_post_actors_by_executive_producer_200(self):
-        response = self.client().post('/actors', headers={
-            "Authorization": "Bearer {}"
-                                      .format(EXECUTIVE_PRODUCER)
-        },
+        response = self.client().post('/actors',
                                       json={
                                           "name": "Fred",
                                           "gender": "male",
                                           "age": 25,
-                                          "movies": [3]
                                       })
         data = json.loads(response.data)
 
@@ -96,7 +87,6 @@ class CastingAgencyTestCase(unittest.TestCase):
                                           "age": 16
                                       })
         data = json.loads(response.data)
-
         self.assertEqual(response.status_code, 401)
         self.assertEqual(data['code'], 'access_forbidden')
 
@@ -109,11 +99,9 @@ class CastingAgencyTestCase(unittest.TestCase):
                                       json={
                                           "title": "Prestige",
                                           "release_date": "2020-05-01",
-                                          'actors': [3]
                                       })
 
         data = json.loads(response.data)
-
         self.assertEqual(data['success'], True)
         self.assertEqual(response.status_code, 200)
 
@@ -129,7 +117,6 @@ class CastingAgencyTestCase(unittest.TestCase):
                                       })
 
         data = json.loads(response.data)
-
         self.assertEqual(response.status_code, 401)
         self.assertEqual(data['code'], 'access_forbidden')
 
@@ -140,7 +127,6 @@ class CastingAgencyTestCase(unittest.TestCase):
                                      .format(CASTING_ASSISTANT)
                                      })
         data = json.loads(response.data)
-
         self.assertEqual(data['success'], True)
         self.assertEqual(response.status_code, 200)
 
@@ -158,7 +144,6 @@ class CastingAgencyTestCase(unittest.TestCase):
                                      .format(CASTING_ASSISTANT)
                                      })
         data = json.loads(response.data)
-
         self.assertEqual(data['success'], True)
         self.assertEqual(response.status_code, 200)
 
@@ -176,8 +161,8 @@ class CastingAgencyTestCase(unittest.TestCase):
                                            "Authorization": "Bearer {}".format(CASTING_DIRECTOR)
                                        },
                                        json={
-                                           "name": "David",
-                                           "gender": "other",
+                                           "name": "Tresor",
+                                           "gender": "Male",
                                            "age": 10,
                                            "movies": [3]
                                        })
@@ -193,8 +178,8 @@ class CastingAgencyTestCase(unittest.TestCase):
                                            "Authorization": "Bearer {}".format(CASTING_ASSISTANT)
                                        },
                                        json={
-                                           "name": "David",
-                                           "gender": "other",
+                                           "name": "Tresor",
+                                           "gender": "Male",
                                            "age": 10,
                                            "movies": [3]
                                        })
@@ -210,8 +195,8 @@ class CastingAgencyTestCase(unittest.TestCase):
                                            "Authorization": "Bearer {}".format(CASTING_DIRECTOR)
                                        },
                                        json={
-                                           "title": "Joker",
-                                           "release_date": "2019-10-1",
+                                           "title": "Anaconda 3",
+                                           "release_date": "2020-10-1",
                                            "cast": [4]
                                        })
 
@@ -226,13 +211,28 @@ class CastingAgencyTestCase(unittest.TestCase):
                                            "Authorization": "Bearer {}".format(CASTING_ASSISTANT)
                                        },
                                        json={
-                                           "title": "Joker",
-                                           "release_date": "2019-10-1",
+                                           "title": "Anaconda 3",
+                                           "release_date": "2020-10-1",
                                        })
 
         data = json.loads(response.data)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(data['code'], 'access_forbidden')
+
+    def test_post_actors_assigned_movie_by_executive_200(self):
+        response = self.client().post('/actors/assign_movie/',
+                                      headers={
+                                          "Authorization": "Bearer {}"
+                                      .format(EXECUTIVE_PRODUCER)
+                                      },
+                                      json={
+                                          "actor_id": 2,
+                                          "movie_id": 1,
+                                      })
+
+        data = json.loads(response.data)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(response.status_code, 200)
 
     def test_delete_actors_by_casting_assistant_401(self):
         response = self.client().delete('actors/1',
@@ -242,7 +242,6 @@ class CastingAgencyTestCase(unittest.TestCase):
                                         }
                                         )
         data = json.loads(response.data)
-
         self.assertEqual(response.status_code, 401)
         self.assertEqual(data['code'], 'access_forbidden')
 
@@ -254,7 +253,6 @@ class CastingAgencyTestCase(unittest.TestCase):
                                         }
                                         )
         data = json.loads(response.data)
-
         self.assertEqual(data['success'], True)
         self.assertEqual(response.status_code, 200)
 
@@ -266,7 +264,6 @@ class CastingAgencyTestCase(unittest.TestCase):
                                         }
                                         )
         data = json.loads(response.data)
-
         self.assertEqual(response.status_code, 401)
         self.assertEqual(data['code'], 'access_forbidden')
 
@@ -278,7 +275,6 @@ class CastingAgencyTestCase(unittest.TestCase):
                                         }
                                         )
         data = json.loads(response.data)
-
         self.assertEqual(data['success'], True)
         self.assertEqual(response.status_code, 200)
 

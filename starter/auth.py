@@ -1,23 +1,13 @@
 import json
 import os
 from urllib.request import urlopen
-from flask import request, _request_ctx_stack
+from flask import request
 from functools import wraps
 from jose import jwt
 
 AUTH0_DOMAIN = os.environ.get('AUTH0_DOMAIN', 'udacity-capstone-project.auth0.com')
 ALGORITHMS = os.environ.get('ALGORITHMS', 'RS256')
 API_AUDIENCE = os.environ.get('API_AUDIENCE', 'capstone-app')
-
-# AUTH0_DOMAIN = 'udacity-capstone-project.auth0.com'
-# ALGORITHMS = ['RS256']
-# API_AUDIENCE = 'capstone-app'
-
-# print(AUTH0_DOMAIN, ALGORITHMS, API_AUDIENCE)
-
-# AUTH0_DOMAIN = 'dxpr.auth0.com'
-# ALGORITHMS = 'RS256'
-# API_AUDIENCE = 'agency'
 
 
 class AuthError(Exception):
@@ -31,12 +21,9 @@ class AuthError(Exception):
 
 
 def get_token_auth_header():
-    '''
+    """
     Implementing get_token_auth_header method
-    - It gets header from request
-    - Split the token from header
-    - return the token part when called
-    '''
+    """
     auth = request.headers.get('Authorization', None)
     # if token is missing raise error
     if auth is None:
@@ -44,15 +31,12 @@ def get_token_auth_header():
             'code': 'no_auth_header',
             'description': 'auth header is needed'
         }, 401)
-    # spliting the auth token
     parts = auth.split(' ')
-    # checking if token is a bearer token
     if parts[0] != 'Bearer':
         raise AuthError({
             'code': 'invalid_header',
             'description': 'Auth header doesn\'t have Bearer at starting'
         }, 401)
-    # checking if token is available
     elif len(parts) == 1:
         raise AuthError({
             'code': 'invalid_header',
@@ -63,12 +47,9 @@ def get_token_auth_header():
 
 
 def check_permissions(permission, payload):
-    '''
-    Implementing check_permissions methos
-    @ Input :- permission: string having permissions (i.e. add:actor)
-               payload: decoded jwt token
-    -Raise error if permission is not included in payload
-    '''
+    """
+    Raise error if permission is not included in payload
+    """
     if 'permissions' not in payload:
         raise AuthError({
             'code': 'invalid_claims',
@@ -84,16 +65,9 @@ def check_permissions(permission, payload):
 
 
 def verify_decode_jwt(token):
-    '''
-    Implement verify_decode_jwt(token) method
-        @INPUTS
-            token: a json web token (string)
-        - It should be an Auth0 token with key id (kid)
-        - It should verify the token using Auth0 /.well-known/jwks.json
-        - It should decode the payload from the token
-        - It should validate the claims
-        - return the decoded payload
-    '''
+    """
+      return the decoded payload
+    """
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
     unverified_header = jwt.get_unverified_header(token)

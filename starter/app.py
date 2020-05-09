@@ -2,12 +2,11 @@ from flask import Flask, request, abort, jsonify
 from flask_migrate import Migrate
 from flask_cors import CORS
 from auth import AuthError, requires_auth
-from models import db, setup_db, Actor, Movie
+from models import db, setup_db, Actor, Movie, helper_table
 
 
 def create_app(test_config=None):
     # configure app
-    # os.environ("SQLALCHEMY_DATABASE_URI") = "postgresql://postgres:puru2000@localhost/casting_agency"
     app = Flask(__name__)
     CORS(app)
     setup_db(app)
@@ -24,7 +23,7 @@ def create_app(test_config=None):
         return response
 
     @app.route('/actors', methods=['GET'])
-    @requires_auth(permission='get:actors')
+    # @requires_auth(permission='get:actors')
     def actors():
         """
             Returns a list of actors
@@ -41,20 +40,21 @@ def create_app(test_config=None):
             abort(422)
 
     @app.route('/actors', methods=['POST'])
-    @requires_auth('post:actors')
+    # @requires_auth('post:actors')
     def post_actors():
         """
         Posts actors and movie played by the actors
         """
+        print(request.get_json())
         name = request.get_json()['name']
         age = request.get_json()['age']
         gender = request.get_json()['gender']
-        played_in_movies = request.get_json()['movies']
+        # played_in_movies = request.json.get("movies", None)
 
         actor = Actor(name=name, age=age, gender=gender)
 
-        for movie in played_in_movies:
-            actor.movies.append(Movie.query.get(movie))
+        # for movie in played_in_movies:
+        #     actor.movies.append(Movie.query.get(movie))
 
         actor.insert()
 
@@ -64,8 +64,27 @@ def create_app(test_config=None):
             "actor": actor.actor_information_format()
         })
 
+    @app.route('/actors/assign_movie/', methods=['POST'])
+    # @requires_auth('post:actors')
+    def post_actors_movie():
+        try:
+            assigned_movie = helper_table.insert().values(actor_id=request.get_json()['actor_id'],
+                                                          movie_id=request.get_json()['movie_id'])
+
+            db.session.execute(assigned_movie)
+            db.session.commit()
+            return jsonify({
+                "success": True,
+                "status_code": 200,
+                "message": 'OK'
+            })
+        except:
+            abort(404)
+
+
+
     @app.route('/actors/<int:actor_id>', methods=['PATCH'])
-    @requires_auth('patch:actors')
+    # @requires_auth('patch:actors')
     def update_actors(actor_id):
         """
         Updates actors data
@@ -73,7 +92,7 @@ def create_app(test_config=None):
         name = request.get_json()['name']
         age = request.get_json()['age']
         gender = request.get_json()['gender']
-        played_in_movies = request.get_json()['movies']
+        played_in_movies = request.json.get("movies", None)
         actor = Actor.query.filter(Actor.id == actor_id).one_or_none()
 
         if actor is None:
@@ -119,7 +138,7 @@ def create_app(test_config=None):
     # Movie Routes
 
     @app.route('/movies', methods=["GET"])
-    @requires_auth('get:movies')
+    # @requires_auth('get:movies')
     def movies():
         """
         Returns a list of movies
@@ -137,25 +156,17 @@ def create_app(test_config=None):
             abort(422)
 
     @app.route('/movies', methods=['POST'])
-    @requires_auth(permission='post:movies')
+    # @requires_auth(permission='post:movies')
     def post_movies():
         """
         Posts movies and actors that play in the movies
         """
         title = request.get_json()['title']
         release_date = request.get_json()['release_date']
-        actors = request.get_json()['actors']
-
         if title is None:
             abort(422)
-
         movie = Movie(title=title, release_date=release_date)
-
-        for i in actors:
-            movie.actors.append(Actor.query.get(i))
-
         movie.insert()
-
         return jsonify({
             "success": True,
             "status_code": 200,
@@ -164,7 +175,7 @@ def create_app(test_config=None):
         })
 
     @app.route('/movies/<int:movie_id>', methods=['GET', 'PATCH'])
-    @requires_auth(permission='patch:movies')
+    # @requires_auth(permission='patch:movies')
     def update_movies(movie_id):
         """
         Updates movies data
