@@ -23,7 +23,7 @@ def create_app(test_config=None):
         return response
 
     @app.route('/actors', methods=['GET'])
-    # @requires_auth(permission='get:actors')
+    @requires_auth(permission='get:actors')
     def actors():
         """
             Returns a list of actors
@@ -40,22 +40,15 @@ def create_app(test_config=None):
             abort(422)
 
     @app.route('/actors', methods=['POST'])
-    # @requires_auth('post:actors')
+    @requires_auth(permission='post:actors')
     def post_actors():
         """
         Posts actors and movie played by the actors
         """
-        print(request.get_json())
         name = request.get_json()['name']
         age = request.get_json()['age']
         gender = request.get_json()['gender']
-        # played_in_movies = request.json.get("movies", None)
-
         actor = Actor(name=name, age=age, gender=gender)
-
-        # for movie in played_in_movies:
-        #     actor.movies.append(Movie.query.get(movie))
-
         actor.insert()
 
         return jsonify({
@@ -64,9 +57,12 @@ def create_app(test_config=None):
             "actor": actor.actor_information_format()
         })
 
-    @app.route('/actors/assign_movie/', methods=['POST'])
-    # @requires_auth('post:actors')
+    @app.route('/assign_movie_to_actor/', methods=['POST'])
+    @requires_auth(permission='post:actors')
     def post_actors_movie():
+        """
+        post actors with assigned movies or movies with assigned_actors
+        """
         try:
             assigned_movie = helper_table.insert().values(actor_id=request.get_json()['actor_id'],
                                                           movie_id=request.get_json()['movie_id'])
@@ -81,10 +77,8 @@ def create_app(test_config=None):
         except:
             abort(404)
 
-
-
     @app.route('/actors/<int:actor_id>', methods=['PATCH'])
-    # @requires_auth('patch:actors')
+    @requires_auth(permission='patch:actors')
     def update_actors(actor_id):
         """
         Updates actors data
@@ -138,7 +132,7 @@ def create_app(test_config=None):
     # Movie Routes
 
     @app.route('/movies', methods=["GET"])
-    # @requires_auth('get:movies')
+    @requires_auth(permission='get:movies')
     def movies():
         """
         Returns a list of movies
@@ -156,7 +150,7 @@ def create_app(test_config=None):
             abort(422)
 
     @app.route('/movies', methods=['POST'])
-    # @requires_auth(permission='post:movies')
+    @requires_auth(permission='post:movies')
     def post_movies():
         """
         Posts movies and actors that play in the movies
@@ -175,7 +169,7 @@ def create_app(test_config=None):
         })
 
     @app.route('/movies/<int:movie_id>', methods=['GET', 'PATCH'])
-    # @requires_auth(permission='patch:movies')
+    @requires_auth(permission='patch:movies')
     def update_movies(movie_id):
         """
         Updates movies data

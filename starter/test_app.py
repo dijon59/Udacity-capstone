@@ -7,9 +7,9 @@ from app import create_app
 from models import setup_db, Actor, Movie
 
 
-CASTING_ASSISTANT = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InlXRTdkaU5pRnVUS1oxWDNzQ1pRWiJ9.eyJpc3MiOiJodHRwczovL3VkYWNpdHktY2Fwc3RvbmUtcHJvamVjdC5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWViNDFkYzkxY2MxYWMwYzE0OGZlNTczIiwiYXVkIjoiY2Fwc3RvbmUtYXBwIiwiaWF0IjoxNTg4OTM4NDQzLCJleHAiOjE1ODg5NDU2NDMsImF6cCI6ImdYS3hhNGwzTGMyczM1WTNldFlMM1JZMXBKUGdKcWZYIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJnZXQ6YWN0b3JzIiwiZ2V0Om1vdmllcyJdfQ.GOSm417wdPaCHiCoFsJH7fnicvwaAjJxEkfIVe8evXk-WTrUVKiI0vdT5X5zfSgZ8YV_fytnkeF3t4uqYV3TwVQebcPW1FEchbJLTheOPuBH4oRGPbmtx9L2fjZsL99kBH7auGLLWd0DayUaseXt0f16pv-KlSe3f4HQmIW79KKhtPO_6WioQS3z-PS0ryhJ7sIv2w-dAB3G3nwXC1azK55s5LXaxS9s5Q4Ap-g3mIuQGnGyieWWpRHvAt9zrS-JtZFqtbpl7uGh9VT5BeARYs_-VoBxTaGSnT12brtkv4R87cWJP5ZH3p9z-WJkJpOgu3rB-8CZ1UFRDHUp7B2pWQ'
-CASTING_DIRECTOR = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InlXRTdkaU5pRnVUS1oxWDNzQ1pRWiJ9.eyJpc3MiOiJodHRwczovL3VkYWNpdHktY2Fwc3RvbmUtcHJvamVjdC5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWViNDFmNDAxY2MxYWMwYzE0OGZlYWQwIiwiYXVkIjoiY2Fwc3RvbmUtYXBwIiwiaWF0IjoxNTg4OTM4NTMyLCJleHAiOjE1ODg5NDU3MzIsImF6cCI6ImdYS3hhNGwzTGMyczM1WTNldFlMM1JZMXBKUGdKcWZYIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJkZWxldGU6YWN0b3JzIiwiZ2V0OmFjdG9ycyIsImdldDptb3ZpZXMiLCJwYXRjaDphY3RvcnMiLCJwYXRjaDptb3ZpZXMiLCJwb3N0OmFjdG9ycyJdfQ.Ego26tyfdDsqtgW2yGQffB6CsU2qvMrp6gq5kuMCnPRgAM542P08s4NaXgFnHjYb8EjNmpFZ7sIWTAbkTfFEAEx_i7lmvLVgfQeYKsQTxuW74mWDMU399K-jnlUNy9qfYxvgXKwgyX1rXqDfl7R8OaFEgoYn1TgjcElKyfYU1HczvqzypI7tQhonuCyoNgjLhO1Pib5b3IGcO6c7dN0VTfTas20jFdUt5uU_CRC2eXW_QJM1TTJLW87e0bkEZn_mJmrvyIJv0cDEV79KisVqGih18-RZhpq7HvxDiRSyeJZ80c6s4eX6UmiMFGpA2Qyi9nbtiXsG4V9Ea0lYuDxEsw'
-EXECUTIVE_PRODUCER = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InlXRTdkaU5pRnVUS1oxWDNzQ1pRWiJ9.eyJpc3MiOiJodHRwczovL3VkYWNpdHktY2Fwc3RvbmUtcHJvamVjdC5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWViNDFmODk2YjY5YmMwYzEyZmY2YmVlIiwiYXVkIjoiY2Fwc3RvbmUtYXBwIiwiaWF0IjoxNTg4OTM4NjA5LCJleHAiOjE1ODg5NDU4MDksImF6cCI6ImdYS3hhNGwzTGMyczM1WTNldFlMM1JZMXBKUGdKcWZYIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJkZWxldGU6YWN0b3JzIiwiZGVsZXRlOm1vdmllcyIsImdldDphY3RvcnMiLCJnZXQ6bW92aWVzIiwicGF0Y2g6YWN0b3JzIiwicGF0Y2g6bW92aWVzIiwicG9zdDphY3RvcnMiLCJwb3N0Om1vdmllcyJdfQ.dZBXa-6HfVbhayfPQ9Bsiu1si67Ws2RZpCRnO1Eb1sWCS523Fe8R8XzbzwcGnJCVpMGmDtzq7yQCFWuVSE6N6vfaCl5-Sor2wDU8Z0ZO_Q_rCuTqxldCGrrTnqQRo5NoNM6GWl_CcOAmGCeIXUkBHYCSdgsb_gaHCmCrQLTiB7oFiRrK7bZorttOGyRhaEZcZc5ZkscVbAtpyv84gPv-rIX7U3qOefWRgew-HZupGvszvW2eXHWW8Wly62tFROfuaBigwEfDhI4MAy_bSZXwo1UUO0Gn1rf4xAsSDvxoWjvpuPYqxJe5NnLsKXCebpSTDaQqvAQDiCL5x_B6vl9z2Q'
+CASTING_ASSISTANT = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InlXRTdkaU5pRnVUS1oxWDNzQ1pRWiJ9.eyJpc3MiOiJodHRwczovL3VkYWNpdHktY2Fwc3RvbmUtcHJvamVjdC5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWViNDFkYzkxY2MxYWMwYzE0OGZlNTczIiwiYXVkIjoiY2Fwc3RvbmUtYXBwIiwiaWF0IjoxNTg5MDI2NzExLCJleHAiOjE1ODkwMzUxMTEsImF6cCI6ImdYS3hhNGwzTGMyczM1WTNldFlMM1JZMXBKUGdKcWZYIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJnZXQ6YWN0b3JzIiwiZ2V0Om1vdmllcyJdfQ.BGdFZuyKQDJdqNBdnzZ-6BxTjG7T5TLurMXm7nEA-WxwfLu3QQl7lQXPOsDeAd3IdisgZORcTsLnga4CAql6YD50FYB2SZ0TzxyKY_sLIOX8nceHDcqdoSi-9iEJWojaa4HyoAgCBCKNsOLAGi93JqVYio5E9LP5lmNF1L287UrkL6HCcE8mrwamlbjsevIzJQppZn6duPmgAv71pKLtt3Nm8glvxLP1qS8YkYx95Go9MRsxWrOua3jH3rN976xXo6caoyAFd5IxNaxMan3HFoyojEyrE4Jprid5lWmbgHUeSyEHMSiRZGEE8zWXOysk1-hdd7rnJfNQf3f3kEdLVw'
+CASTING_DIRECTOR = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InlXRTdkaU5pRnVUS1oxWDNzQ1pRWiJ9.eyJpc3MiOiJodHRwczovL3VkYWNpdHktY2Fwc3RvbmUtcHJvamVjdC5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWViNDFmNDAxY2MxYWMwYzE0OGZlYWQwIiwiYXVkIjoiY2Fwc3RvbmUtYXBwIiwiaWF0IjoxNTg5MDIxNjU1LCJleHAiOjE1ODkwMjg4NTUsImF6cCI6ImdYS3hhNGwzTGMyczM1WTNldFlMM1JZMXBKUGdKcWZYIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJkZWxldGU6YWN0b3JzIiwiZ2V0OmFjdG9ycyIsImdldDptb3ZpZXMiLCJwYXRjaDphY3RvcnMiLCJwYXRjaDptb3ZpZXMiLCJwb3N0OmFjdG9ycyJdfQ.PSjuwFnvqGIUfuEYZiDDDyssi6VoA2Q-99jSZqS50RqrZIUH327VDS6VLHZu_UiSAtnU8jYjzndhrDjG0yhSaTOPlzpntCTfv4rnTYY7couWAj3-ZGkjcTZyXcfuuj3GTmDXkeQpCjlw5010spWM_08p8-vpy1_xNo1ERYf0k4gioBQVWNtOovkbtjJ3vtfBlIjuIDeQy0TSzp40vtIhfaDmD00nMJg1v_4Jgrd_dzhBlEoZyn_nOY3_yleypeehEPbjzbsxzuZuaThKLdDhxCBxMZexn4BAgW2w89LdEy55uZoGO36OFPeDekVPUdWDqajHPCJRwrBHHMD0c6FLLg'
+EXECUTIVE_PRODUCER = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InlXRTdkaU5pRnVUS1oxWDNzQ1pRWiJ9.eyJpc3MiOiJodHRwczovL3VkYWNpdHktY2Fwc3RvbmUtcHJvamVjdC5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWViNDFmODk2YjY5YmMwYzEyZmY2YmVlIiwiYXVkIjoiY2Fwc3RvbmUtYXBwIiwiaWF0IjoxNTg5MDIxNzI4LCJleHAiOjE1ODkwMjg5MjgsImF6cCI6ImdYS3hhNGwzTGMyczM1WTNldFlMM1JZMXBKUGdKcWZYIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJkZWxldGU6YWN0b3JzIiwiZGVsZXRlOm1vdmllcyIsImdldDphY3RvcnMiLCJnZXQ6bW92aWVzIiwicGF0Y2g6YWN0b3JzIiwicGF0Y2g6bW92aWVzIiwicG9zdDphY3RvcnMiLCJwb3N0Om1vdmllcyJdfQ.gM-5q0MOzvR0nrn12C9YpAdd6i8rfC0C-kSZ84V05sgkAWzrNNssrvo16ov-JiH-2IiZa9jcsqjF4v4nDiLgfEomA-qU90-FfiRHl3G1i3KS_C2dksjdun96PWkEU5u5U3eupSj6UqmPwevr2xaHhzlmZohBtU0TsarLWnTXB1rR_r70B98sAwFaA-9nEAnhGR3tZorg0eXgnLSRMvDQBGzKr_i4XiBQE_tkAf_K3pWg5xdTcbqaSV5uEjAPwuPGB0mexSmOVIn5Af_2Z0Z7YvYqaZ9OQt77RbOgI8ZF2W85GQmN9qYtALG1aKP0egkjCmEmE5nWDEWm5LCVKScqvg'
 
 
 class CastingAgencyTestCase(unittest.TestCase):
@@ -64,7 +64,10 @@ class CastingAgencyTestCase(unittest.TestCase):
     '''
 
     def test_post_actors_by_executive_producer_200(self):
-        response = self.client().post('/actors',
+        response = self.client().post('/actors', headers={
+                                          "Authorization": "Bearer {}"
+                                      .format(EXECUTIVE_PRODUCER)
+                                      },
                                       json={
                                           "name": "Fred",
                                           "gender": "male",
@@ -220,13 +223,13 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.assertEqual(data['code'], 'access_forbidden')
 
     def test_post_actors_assigned_movie_by_executive_200(self):
-        response = self.client().post('/actors/assign_movie/',
+        response = self.client().post('/assign_movie_to_actor/',
                                       headers={
                                           "Authorization": "Bearer {}"
                                       .format(EXECUTIVE_PRODUCER)
                                       },
                                       json={
-                                          "actor_id": 2,
+                                          "actor_id": 1,
                                           "movie_id": 1,
                                       })
 
